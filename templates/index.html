@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Visualization</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        body {
+            background-color: #001f3f;
+            color: #ffffff;
+            font-family: 'Arial', sans-serif;
+        }
+        h1 {
+            text-align: center;
+            color: #ffffff;
+        }
+        img {
+            display: block;
+            margin: 0 auto;
+        }
+        table.dataframe {
+            border-collapse: collapse;
+            width: 80%;
+            margin: 20px auto;
+            font-family: 'Arial', sans-serif;
+            color: #ffffff;
+        }
+        table.dataframe, th, td {
+            border: 2px solid #dddddd;
+            padding: 10px;
+        }
+        th, td {
+            background-color: transparent;
+        }
+    </style>
+</head>
+<body>
+    <h1>Data Visualization</h1>
+    <img src="{{ url_for('static', filename='plot.png') }}" alt="Plot">
+    <h1>Data Table</h1>
+    {{ table|safe }}
+</body>
+</html>

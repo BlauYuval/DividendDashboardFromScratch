@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Table</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        table.dataframe {
+            border-collapse: collapse;
+            width: 80%;
+            margin: 20px auto;
+            font-family: 'Arial', sans-serif;
+        }
+        table.dataframe, th, td {
+            border: 2px solid white;
+            padding: 10px;
+        }
+        th, td {
+            text-align: center;
+        }
+        th {
+            background-color: #39CCCC;
+        }
+        td {
+            background-color: #001f3f;
+        }
+    </style>
+</head>
+<body>
+    <h1>Data Table</h1>
+    {{ table|safe }}
+    <a href="/">Back to Home</a>
+</body>
+</html>
