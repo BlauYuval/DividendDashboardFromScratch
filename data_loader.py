@@ -28,7 +28,7 @@ class DataLoader:
 
     def get_transaction_data(self):
         scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
-        creds = ServiceAccountCredentials.from_json_keyfile_name('cred.json', scope)
+        creds = ServiceAccountCredentials.from_json_keyfile_name('secrets/cred.json', scope)
         client = gspread.authorize(creds)
         sheet = client.open("dividend_data").sheet1  # Open the first sheet
         data = sheet.get_all_records()
@@ -37,7 +37,7 @@ class DataLoader:
 
     def get_sectors_data(self):
         scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
-        creds = ServiceAccountCredentials.from_json_keyfile_name('cred.json', scope)
+        creds = ServiceAccountCredentials.from_json_keyfile_name('secrets/cred.json', scope)
         client = gspread.authorize(creds)
         sheet = client.open("sectors").sheet1  # Open the first sheet
         data = sheet.get_all_records()

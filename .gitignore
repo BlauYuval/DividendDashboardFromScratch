@@ -162,4 +162,4 @@ cython_debug/
 #.idea/
 
 # credenitilas json
-cred.json
+secrets/
