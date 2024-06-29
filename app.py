@@ -26,8 +26,7 @@ def index():
     data_loader = DataLoader()
     transaction_data, sectors_data, daily_prices = data_loader.run()
     
-    portfolio = Portfolio(transaction_data, sectors_data)
-    portfolio.run()  
+
     portfolio_returns = PortfolioReturns(transaction_data.rename(columns={'signed_shares':'shares'}), daily_prices)
     total_amounts = portfolio_returns.run()
     portfolio_to_plot = portfolio_returns.plot_portfolio(total_amounts, transaction_data['date'].min(), portfolio_returns.today)
@@ -46,7 +45,8 @@ def index():
     plt.savefig('static/plot.png')
     plt.close()
     
-    
+    portfolio = Portfolio(transaction_data, sectors_data)
+    portfolio.run()      
     portfolio_table = portfolio.plot_portoflio_tbl()
     table_html = portfolio_table.to_html(classes='dataframe', border=2)
 
