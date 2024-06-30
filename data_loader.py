@@ -1,3 +1,4 @@
+import os
 import gspread
 import pandas as pd
 import yfinance as yf
@@ -28,6 +29,16 @@ class DataLoader:
 
     def get_transaction_data(self):
         scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
+        
+        # Print current working directory
+        print(f"Current working directory: {os.getcwd()}")
+
+        # Check if the file exists
+        if os.path.isfile('secrets/cred.json'):
+            print("File 'secrets/cred.json' exists")
+        else:
+            print("File 'secrets/cred.json' does not exist")
+        
         creds = ServiceAccountCredentials.from_json_keyfile_name('secrets/cred.json', scope)
         client = gspread.authorize(creds)
         sheet = client.open("dividend_data").sheet1  # Open the first sheet
