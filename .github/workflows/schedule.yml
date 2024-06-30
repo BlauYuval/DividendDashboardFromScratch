@@ -41,6 +41,13 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r requirements.txt
 
+    - name: Check working directory
+      run: |
+        echo "Current working directory:"
+        pwd
+        echo "Contents of the working directory:"
+        ls -al
+
     - name: Run data_to_save.py
       env:
         REDIS_HOST: ${{ secrets.REDIS_HOST }}
