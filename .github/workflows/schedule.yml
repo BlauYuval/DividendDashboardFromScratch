@@ -2,7 +2,7 @@ name: Daily Data to Redis
 
 on:
   schedule:
-    - cron: '0 3 * * *'  # Runs at 3 AM daily
+    - cron: '0 5 * * *'  # Runs at 5 AM daily
   workflow_dispatch:
 
 jobs:
@@ -19,9 +19,11 @@ jobs:
         python-version: '3.x'
 
     - name: Create creds.json file
-      run: echo $GOOGLE_SHEET_CREDS > secrets/creds.json
+      run: |
+        mkdir -p secrets
+        echo "$CREDS_JSON" > secrets/creds.json
       env:
-        GOOGLE_SHEET_CREDS: ${{ secrets.GOOGLE_SHEET_CREDS }}
+        CREDS_JSON: ${{ secrets.CREDS_JSON }}
 
     - name: Install dependencies
       run: |
