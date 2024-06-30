@@ -48,6 +48,11 @@ jobs:
         echo "Contents of the working directory:"
         ls -al
 
+    - name: Check secrets directory
+      run: |
+        echo "Contents of the secrets directory:"
+        ls -al secrets
+
     - name: Run data_to_save.py
       env:
         REDIS_HOST: ${{ secrets.REDIS_HOST }}
