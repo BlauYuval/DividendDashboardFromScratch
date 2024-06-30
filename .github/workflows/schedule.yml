@@ -53,7 +53,11 @@ jobs:
         echo "Contents of the secrets directory:"
         ls -al secrets
 
+    - name: Print creds.json contents
+      run: cat secrets/creds.json
+
     - name: Run data_to_save.py
+      working-directory: /home/runner/work/DividendDashboardFromScratch/DividendDashboardFromScratch
       env:
         REDIS_HOST: ${{ secrets.REDIS_HOST }}
         REDIS_PORT: ${{ secrets.REDIS_PORT }}
