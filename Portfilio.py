@@ -6,10 +6,6 @@
 # - The total amount invested in each sector
 # - The total amount invested in the portfolio
 
-import streamlit as st
-import plotly.graph_objects as go
-import plotly.express as px
-
 from utils import _get_close_price
 
 class Portfolio:
@@ -76,7 +72,7 @@ class Portfolio:
         df_for_plot['percent'] = (df_for_plot['Amount Paid']/df_for_plot['Amount Paid'].sum()).apply(lambda x: round(x, 2))*100     
         df_for_plot = df_for_plot.sort_values('percent', ascending=True)
         
-        st.bar_chart(data=df_for_plot, x='sector', y='percent', height=500)
+        # st.bar_chart(data=df_for_plot, x='sector', y='percent', height=500)
 
         
         

@@ -1,6 +1,5 @@
 import pandas as pd
 import yfinance as yf
-import streamlit as st
 
 class PortfolioReturns:
     
@@ -64,7 +63,8 @@ class PortfolioReturns:
         :param ticker: 
         :return: 
         """
-        ticker = st.text_input('Valid Uppercase Ticker:', 'SCHD')
+        # ticker = st.text_input('Valid Uppercase Ticker:', 'SCHD')
+        ticker = 'SCHD'
         try:
             prices = yf.Ticker(ticker).history(start=self.portfolio_df['date'].min(), auto_adjust=False)
             prices.index = pd.to_datetime(prices.index.strftime('%Y-%m-%d'))
@@ -74,7 +74,7 @@ class PortfolioReturns:
             other_ticker_prices = pd.concat([dates, other_ticker_prices], axis=1).fillna(method='ffill') 
             self.other_ticker = ticker  
         except:
-            st.write(f"Could not find {ticker} in Stock Market. Please try again (maybe upper case ticker?)")
+            # st.write(f"Could not find {ticker} in Stock Market. Please try again (maybe upper case ticker?)")
             other_ticker_prices = pd.DataFrame()
         
         return other_ticker_prices
