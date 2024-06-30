@@ -2,7 +2,7 @@ name: Daily Data to Redis
 
 on:
   schedule:
-    - cron: '0 3 * * *'  # Runs at 5 AM daily
+    - cron: '0 3 * * *'  # Runs at 3 AM daily
   workflow_dispatch:
 
 jobs:
@@ -22,8 +22,18 @@ jobs:
       run: |
         mkdir -p secrets
         echo "$GOOGLE_SHEET_CREDS" > secrets/creds.json
+        cat secrets/creds.json  # Check the content of the created file
       env:
         GOOGLE_SHEET_CREDS: ${{ secrets.GOOGLE_SHEET_CREDS }}
+
+    - name: Verify creds.json file
+      run: |
+        if [ -f "secrets/creds.json" ]; then
+          echo "creds.json file exists"
+        else
+          echo "creds.json file does not exist"
+          exit 1
+        fi
 
     - name: Install dependencies
       run: |
