@@ -18,7 +18,13 @@ jobs:
       with:
         python-version: '3.x'
 
+    - name: Print working directory before creating creds.json
+      run: |
+        echo "Current working directory before creating creds.json:"
+        pwd
+
     - name: Create creds.json file
+      working-directory: /home/runner/work/DividendDashboardFromScratch/DividendDashboardFromScratch
       run: |
         mkdir -p secrets
         echo "$GOOGLE_SHEET_CREDS" > secrets/creds.json
@@ -28,6 +34,7 @@ jobs:
         GOOGLE_SHEET_CREDS: ${{ secrets.GOOGLE_SHEET_CREDS }}
 
     - name: Verify creds.json file
+      working-directory: /home/runner/work/DividendDashboardFromScratch/DividendDashboardFromScratch
       run: |
         if [ -f "secrets/creds.json" ]; then
           echo "creds.json file exists"
@@ -37,6 +44,7 @@ jobs:
         fi
 
     - name: Install dependencies
+      working-directory: /home/runner/work/DividendDashboardFromScratch/DividendDashboardFromScratch
       run: |
         python -m pip install --upgrade pip
         pip install -r requirements.txt
@@ -49,11 +57,13 @@ jobs:
         ls -al
 
     - name: Check secrets directory
+      working-directory: /home/runner/work/DividendDashboardFromScratch/DividendDashboardFromScratch
       run: |
         echo "Contents of the secrets directory:"
         ls -al secrets
 
     - name: Print creds.json contents
+      working-directory: /home/runner/work/DividendDashboardFromScratch/DividendDashboardFromScratch
       run: cat secrets/creds.json
 
     - name: Run data_to_save.py
