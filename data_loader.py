@@ -39,7 +39,7 @@ class DataLoader:
         else:
             print("File 'secrets/cred.json' does not exist")
         
-        creds = ServiceAccountCredentials.from_json_keyfile_name('secrets/cred.json', scope)
+        creds = ServiceAccountCredentials.from_json_keyfile_name('secrets/creds.json', scope)
         client = gspread.authorize(creds)
         sheet = client.open("dividend_data").sheet1  # Open the first sheet
         data = sheet.get_all_records()
