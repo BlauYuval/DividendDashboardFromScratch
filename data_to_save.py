@@ -33,18 +33,20 @@ portfolio = Portfolio(transaction_data, sectors_data)
 portfolio.run()      
 portfolio_table = portfolio.plot_portoflio_tbl()
 
-## INCOME
-income = Income(transaction_data, dividends_data)
-monthly_income, yearly_income = income.run()
-income_dict = json.dumps({'monthly':monthly_income, 'yearly':yearly_income})
+if len(dividends_data) > 0:
+    ## INCOME
+    income = Income(transaction_data, dividends_data)
+    monthly_income, yearly_income = income.run()
+    income_dict = json.dumps({'monthly':monthly_income, 'yearly':yearly_income})
 
-## GROWTH
-tickers = portfolio.portfolio_data.ticker.to_list()
-growth = DividendGrowth(income.transaction_data[['ticker','start_payment_date']], dividends_data, tickers)
-growth_df = growth.run()
+    ## GROWTH
+    tickers = portfolio.portfolio_data.ticker.to_list()
+    growth = DividendGrowth(income.transaction_data[['ticker','start_payment_date']], dividends_data, tickers)
+    growth_df = growth.run()
 
 # Save data to Redis
 r.set('portfolio_to_plot', portfolio_to_plot.to_json())
 r.set('portfolio_table', portfolio_table.to_json())
-r.set('income_dict', income_dict)
-r.set('growth_table', growth_df.to_json())
+if len(dividends_data):
+    r.set('income_dict', income_dict)
+    r.set('growth_table', growth_df.to_json())
