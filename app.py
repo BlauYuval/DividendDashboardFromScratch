@@ -1,16 +1,14 @@
 import os
-import json
-from flask import Flask, render_template
-from flask_basicauth import BasicAuth
+import ast
+import redis
 import matplotlib
-matplotlib.use('Agg')  # Use the 'Agg' backend for Matplotlib
-import matplotlib.pyplot as plt
 import pandas as pd
 import seaborn as sns
-
-from Portfilio import Portfolio
-from PortfolioReturns import PortfolioReturns
-from data_loader import DataLoader
+matplotlib.use('Agg')  # Use the 'Agg' backend for Matplotlib
+import matplotlib.pyplot as plt
+from dotenv import load_dotenv
+from flask import Flask, render_template
+from flask_basicauth import BasicAuth
 
 app = Flask(__name__)
 
@@ -23,15 +21,24 @@ basic_auth = BasicAuth(app)
 @basic_auth.required
 def index():
 
-    data_loader = DataLoader()
-    transaction_data, sectors_data, daily_prices = data_loader.run()
-    
+    # Load environment variables from .env file
+    load_dotenv()
 
-    portfolio_returns = PortfolioReturns(transaction_data.rename(columns={'signed_shares':'shares'}), daily_prices)
-    total_amounts = portfolio_returns.run()
-    portfolio_to_plot = portfolio_returns.plot_portfolio(total_amounts, transaction_data['date'].min(), portfolio_returns.today)
-    portfolio_to_plot = portfolio_to_plot.reset_index()
-    portfolio_to_plot.columns = ['Date', 'Return']
+    # Initialize Redis connection
+    redis_host = os.getenv('REDIS_HOST')
+    redis_port = int(os.getenv('REDIS_PORT'))
+    redis_password = os.getenv('REDIS_PASSWORD')
+
+    r = redis.Redis(host=redis_host, port=redis_port, password=redis_password)
+
+    # Fetch data from Redis
+    portfolio_to_plot_json = r.get('portfolio_to_plot')
+    portfolio_table_json = r.get('portfolio_table')   
+    
+    portfolio_table = pd.DataFrame(ast.literal_eval(portfolio_table_json.decode('utf-8')))
+    portfolio_to_plot = pd.DataFrame(ast.literal_eval(portfolio_to_plot_json.decode('utf-8')))
+    portfolio_to_plot['Date'] = pd.to_datetime(portfolio_to_plot['Date'], unit='ms')
+    
     plt.figure(figsize=(10,6), facecolor='none')
     sns.set(style="darkgrid")
     ax = sns.lineplot(data=portfolio_to_plot.reset_index(), y='Return', x='Date', color="white")
@@ -45,9 +52,6 @@ def index():
     plt.savefig('static/plot.png')
     plt.close()
     
-    portfolio = Portfolio(transaction_data, sectors_data)
-    portfolio.run()      
-    portfolio_table = portfolio.plot_portoflio_tbl()
     table_html = portfolio_table.to_html(classes='dataframe', border=2)
 
     return render_template('index.html', table=table_html)
