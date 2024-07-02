@@ -4,7 +4,8 @@ import pandas as pd
 import yfinance as yf
 from oauth2client.service_account import ServiceAccountCredentials
 
-from data_preprocessor import TransactionDataPreprocessing
+from data_preprocessor import TransactionDataPreprocessing, DividendDataPreprocessor
+from utils import get_div_hist_per_stock
 
 
 class DataLoader:
@@ -42,6 +43,24 @@ class DataLoader:
         data = sheet.get_all_records()
         df = pd.DataFrame(data)
         return df
+    
+    def get_dividend_data(self, transaction_data):
+        """
+        Get the dividend data
+        """
+        dividends_dict = {}
+        try:
+            tickers = transaction_data.ticker.unique()
+            for ticker in tickers:
+                dividends_dict[ticker] = get_div_hist_per_stock(ticker)
+                
+            dividend_preprocessor = DividendDataPreprocessor()
+            dividend_preprocessor.preprocess_multiple_tickers_data(dividends_dict)
+            dividends_data = dividend_preprocessor.df.copy()
+        except:
+            dividends_data = pd.DataFrame()
+        
+        return dividends_data
 
     def run(self):
     # Fetch table data from Google Sheets
@@ -51,5 +70,6 @@ class DataLoader:
         transaction_data = transaction_preprocessor.df.copy()
         sectors_data = self.get_sectors_data()
         daily_prices = self.get_daily_prices_data(transaction_data.ticker.unique(), transaction_data.date.min())
+        dividend_dict = self.get_dividend_data(transaction_data)
         
-        return transaction_data, sectors_data, daily_prices
+        return transaction_data, sectors_data, daily_prices, dividend_dict

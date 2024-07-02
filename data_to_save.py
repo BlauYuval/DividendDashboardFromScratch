@@ -1,9 +1,12 @@
 import os
+import json
 import redis
-import pandas as pd
+from income import Income
 from Portfilio import Portfolio
-from PortfolioReturns import PortfolioReturns
+from growth import DividendGrowth
 from data_loader import DataLoader
+from PortfolioReturns import PortfolioReturns
+
 # from secrets import redis_password
 from dotenv import load_dotenv
 
@@ -17,8 +20,9 @@ redis_password = os.getenv('REDIS_PASSWORD')  # Replace with the password from t
 r = redis.Redis(host=redis_host, port=redis_port, password=redis_password)
 
 data_loader = DataLoader()
-transaction_data, sectors_data, daily_prices = data_loader.run()
+transaction_data, sectors_data, daily_prices, dividends_data = data_loader.run()
 
+## PORTFOLIO
 portfolio_returns = PortfolioReturns(transaction_data.rename(columns={'signed_shares':'shares'}), daily_prices)
 total_amounts = portfolio_returns.run()
 portfolio_to_plot = portfolio_returns.plot_portfolio(total_amounts, transaction_data['date'].min(), portfolio_returns.today)
@@ -29,6 +33,18 @@ portfolio = Portfolio(transaction_data, sectors_data)
 portfolio.run()      
 portfolio_table = portfolio.plot_portoflio_tbl()
 
+## INCOME
+income = Income(transaction_data, dividends_data)
+monthly_income, yearly_income = income.run()
+income_dict = json.dumps({'monthly':monthly_income, 'yearly':yearly_income})
+
+## GROWTH
+tickers = portfolio.portfolio_data.ticker.to_list()
+growth = DividendGrowth(income.transaction_data[['ticker','start_payment_date']], dividends_data, tickers)
+growth_df = growth.run()
+
 # Save data to Redis
 r.set('portfolio_to_plot', portfolio_to_plot.to_json())
 r.set('portfolio_table', portfolio_table.to_json())
+r.set('income_dict', income_dict)
+r.set('growth_table', growth_df.to_json())
