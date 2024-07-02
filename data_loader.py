@@ -11,9 +11,6 @@ class DataLoader:
     
     def __init__(self):
         pass
-        # self.transaction_data = None
-        # self.sectors_data = None
-        # self.daily_prices = None
     
     def get_daily_prices_data(self, tickers, start_time):
         """
@@ -29,15 +26,6 @@ class DataLoader:
 
     def get_transaction_data(self):
         scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
-        
-        # Print current working directory
-        print(f"Current working directory: {os.getcwd()}")
-
-        # Check if the file exists
-        if os.path.isfile('secrets/cred.json'):
-            print("File 'secrets/cred.json' exists")
-        else:
-            print("File 'secrets/cred.json' does not exist")
         
         creds = ServiceAccountCredentials.from_json_keyfile_name('secrets/creds.json', scope)
         client = gspread.authorize(creds)

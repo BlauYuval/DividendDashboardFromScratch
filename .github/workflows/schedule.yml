@@ -2,7 +2,7 @@ name: Daily Data to Redis
 
 on:
   schedule:
-    - cron: '0 5 * * *'  # Runs at 5 AM daily
+    - cron: '0 3 * * *'  # Runs at 3 AM daily
   workflow_dispatch:
 
 jobs:
@@ -18,11 +18,6 @@ jobs:
       with:
         python-version: '3.x'
 
-    - name: Print working directory before creating creds.json
-      run: |
-        echo "Current working directory before creating creds.json:"
-        pwd
-
     - name: Create creds.json file
       working-directory: /home/runner/work/DividendDashboardFromScratch/DividendDashboardFromScratch
       run: |
@@ -32,16 +27,6 @@ jobs:
         cat secrets/creds.json  # Check the content of the created file
       env:
         GOOGLE_SHEET_CREDS: ${{ secrets.GOOGLE_SHEET_CREDS }}
-
-    - name: Verify creds.json file
-      working-directory: /home/runner/work/DividendDashboardFromScratch/DividendDashboardFromScratch
-      run: |
-        if [ -f "secrets/creds.json" ]; then
-          echo "creds.json file exists"
-        else
-          echo "creds.json file does not exist"
-          exit 1
-        fi
 
     - name: Install dependencies
       working-directory: /home/runner/work/DividendDashboardFromScratch/DividendDashboardFromScratch
@@ -55,16 +40,6 @@ jobs:
         pwd
         echo "Contents of the working directory:"
         ls -al
-
-    - name: Check secrets directory
-      working-directory: /home/runner/work/DividendDashboardFromScratch/DividendDashboardFromScratch
-      run: |
-        echo "Contents of the secrets directory:"
-        ls -al secrets
-
-    - name: Print creds.json contents
-      working-directory: /home/runner/work/DividendDashboardFromScratch/DividendDashboardFromScratch
-      run: cat secrets/creds.json
 
     - name: Run data_to_save.py
       working-directory: /home/runner/work/DividendDashboardFromScratch/DividendDashboardFromScratch
