@@ -45,6 +45,7 @@ if len(dividends_data) > 0:
     growth_df = growth.run()
 
 # Save data to Redis
+r.set('transaction_data', transaction_data.to_json())
 r.set('portfolio_to_plot', portfolio_to_plot.to_json())
 r.set('portfolio_table', portfolio_table.to_json())
 if len(dividends_data):
