@@ -48,6 +48,6 @@ if len(dividends_data) > 0:
 r.set('portfolio_to_plot', portfolio_to_plot.to_json())
 r.set('portfolio_table', portfolio_table.to_json())
 if len(dividends_data):
-    r.set('dividends_data', dividends_data.reset_index(drop=True).to_json())
+    r.set('dividends_data', dividends_data.reset_index().to_json())
     r.set('income_dict', income_dict)
     r.set('growth_table', growth_df.to_json())
