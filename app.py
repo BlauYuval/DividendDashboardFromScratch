@@ -10,6 +10,9 @@ from dotenv import load_dotenv
 from flask import Flask, render_template
 from flask_basicauth import BasicAuth
 
+from income import Income
+from visualization import vizualize_income_bar
+
 app = Flask(__name__)
 
 # Basic Auth Configuration
@@ -32,12 +35,20 @@ def index():
     r = redis.Redis(host=redis_host, port=redis_port, password=redis_password)
 
     # Fetch data from Redis
+    transaction_data_json = r.get('transaction_data')
     portfolio_to_plot_json = r.get('portfolio_to_plot')
     portfolio_table_json = r.get('portfolio_table')   
+    dividends_data_json  = r.get('dividends_data')
     
+    transaction_data = pd.DataFrame(ast.literal_eval(transaction_data_json.decode('utf-8')))
+    transaction_data['date'] = pd.to_datetime(transaction_data['date'], unit='ms')
+    transaction_data['start_payment_date'] = pd.to_datetime(transaction_data['start_payment_date'], unit='ms')
     portfolio_table = pd.DataFrame(ast.literal_eval(portfolio_table_json.decode('utf-8')))
     portfolio_to_plot = pd.DataFrame(ast.literal_eval(portfolio_to_plot_json.decode('utf-8')))
     portfolio_to_plot['Date'] = pd.to_datetime(portfolio_to_plot['Date'], unit='ms')
+    dividends_data = pd.DataFrame(ast.literal_eval(dividends_data_json.decode('utf-8')))
+    income = Income(transaction_data, dividends_data)
+    monthly_income, yearly_income = income.run()
     
     plt.figure(figsize=(10,6), facecolor='none')
     sns.set(style="darkgrid")
@@ -53,6 +64,10 @@ def index():
     plt.close()
     
     table_html = portfolio_table.to_html(classes='dataframe', border=2)
+    
+    bar_plot = vizualize_income_bar(income.dividend_daily_data, 'Monthly')
+    bar_plot.savefig('static/bar_plot.png')
+    plt.close()
 
     return render_template('index.html', table=table_html)
 

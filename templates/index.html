@@ -37,8 +37,10 @@
 </head>
 <body>
     <h1>Data Visualization</h1>
-    <img src="{{ url_for('static', filename='plot.png') }}" alt="Plot">
+    <img src="{{ url_for('static', filename='plot.png') }}" alt="Portfolio Returns Plot">
     <h1>Data Table</h1>
     {{ table|safe }}
+    <h1>Monthly Income Bar Plot</h1>
+    <img src="{{ url_for('static', filename='bar_plot.png') }}" alt="Monthly Income Bar Plot">
 </body>
 </html>
