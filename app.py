@@ -11,7 +11,7 @@ from flask import Flask, render_template, jsonify
 from flask_basicauth import BasicAuth
 
 from income import Income
-from visualization import vizualize_income_bar
+from visualization import vizualize_income_bar, vizualize_sectors_bar
 
 app = Flask(__name__)
 
@@ -62,6 +62,11 @@ def index():
     plt.title('Portfolio Returns', color='white')  # Set plot title to white
     plt.savefig('static/plot.png')
     plt.close()
+    
+    # Generate sectors bar plot
+    sector_bar = vizualize_sectors_bar(portfolio_table)
+    sector_bar.savefig('static/sectors_bar_plot.png')
+    plt.close(sector_bar.figure)
     
     table_html = portfolio_table.to_html(classes='dataframe', border=2)
     
