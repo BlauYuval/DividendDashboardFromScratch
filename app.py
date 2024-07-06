@@ -7,7 +7,7 @@ import seaborn as sns
 matplotlib.use('Agg')  # Use the 'Agg' backend for Matplotlib
 import matplotlib.pyplot as plt
 from dotenv import load_dotenv
-from flask import Flask, render_template
+from flask import Flask, render_template, jsonify  
 from flask_basicauth import BasicAuth
 
 from income import Income
@@ -65,11 +65,26 @@ def index():
     
     table_html = portfolio_table.to_html(classes='dataframe', border=2)
     
-    bar_plot = vizualize_income_bar(income.dividend_daily_data, 'Monthly')
-    bar_plot.savefig('static/bar_plot.png')
-    plt.close()
+    # Generate bar plots for all periods
+    bar_plot_m = vizualize_income_bar(income.dividend_daily_data, 'Monthly')
+    bar_plot_m.savefig('static/bar_plot_monthly.png')
+    plt.close(bar_plot_m.figure)
+    
+    bar_plot_q = vizualize_income_bar(income.dividend_daily_data, 'Quaterly')
+    bar_plot_q.savefig('static/bar_plot_quaterly.png')
+    plt.close(bar_plot_q.figure)
+    
+    bar_plot_y = vizualize_income_bar(income.dividend_daily_data, 'Yearly')
+    bar_plot_y.savefig('static/bar_plot_yearly.png')
+    plt.close(bar_plot_y.figure)
 
     return render_template('index.html', table=table_html)
+
+@app.route('/update_plot/<period>')
+@basic_auth.required
+def update_plot(period):
+    plot_filename = f'static/bar_plot_{period}.png'
+    return jsonify({'plot_url': plot_filename})
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
