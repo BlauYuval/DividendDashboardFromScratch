@@ -33,45 +33,68 @@
         th, td {
             background-color: transparent;
         }
-        .buttons {
-            text-align: center;
-            margin-bottom: 10px; /* Reduce margin to decrease space */
+        .growth-table-container {
+            display: flex;
+            justify-content: center; /* Center the table horizontally */
+            align-items: center; /* Center the table vertically */
+            margin: 20px auto; /* Ensure space around the table */
+            width: 100%; /* Ensure the container spans the full width */
         }
-        .button {
-            background-color: #39CCCC;
-            border: none;
-            color: white;
-            padding: 10px 20px;
+        .growth-table {
+            width: 80%; /* Ensure the table takes up a consistent width */
+        }
+        .income-container, .executive-summery-container {
             text-align: center;
-            text-decoration: none;
+        }
+        .income-box, .executive-summery-box {
             display: inline-block;
-            font-size: 16px;
-            margin: 4px 2px;
-            cursor: pointer;
+            background-color: transparent;
+            border: 2px solid white;
             border-radius: 5px;
+            padding: 10px 20px;
+            margin: 10px;
+            font-size: 1.2em;
+        }
+        .btn-group {
+            text-align: center;
+            margin-top: 20px; /* Add some space above the buttons */
         }
     </style>
 </head>
 <body>
     <h1>Data Visualization</h1>
-    <img src="{{ url_for('static', filename='plot.png') }}" alt="Portfolio Returns Plot">
-    <h1>Sectors Bar Plot</h1>
+    <div class="executive-summery-container">
+        <div class="executive-summery-box">Total Return: {{ total_return }}</div>
+        <div class="executive-summery-box">Return Yield: {{ return_yield }}</div>
+        <div class="executive-summery-box">Yield on Cost: {{ yield_on_cost }}</div>
+        <div class="executive-summery-box">Average Dividend Growth: {{ average_dividend_growth }}</div>
+    </div>
+    <img src="{{ url_for('static', filename='plot.png') }}" alt="Plot">
+    <h1>Sector Distribution</h1>
     <img src="{{ url_for('static', filename='sectors_bar_plot.png') }}" alt="Sectors Bar Plot">
     <h1>Data Table</h1>
     {{ table|safe }}
-    <h1>Income Bar Plot</h1>
-    <div class="buttons">
-        <button class="button" onclick="updatePlot('monthly')">Monthly</button>
-        <button class="button" onclick="updatePlot('quaterly')">Quarterly</button>
-        <button class="button" onclick="updatePlot('yearly')">Yearly</button>
+    <h1>Monthly Income Distribution</h1>
+    <div class="income-container">
+        <div class="income-box">Monthly Income: {{ monthly_income }}</div>
+        <div class="income-box">Yearly Income: {{ yearly_income }}</div>
     </div>
-    <img id="bar-plot" src="{{ url_for('static', filename='bar_plot_monthly.png') }}" alt="Income Bar Plot">
+    <div class="btn-group">
+        <button onclick="updatePlot('monthly')">Monthly</button>
+        <button onclick="updatePlot('quaterly')">Quarterly</button>
+        <button onclick="updatePlot('yearly')">Yearly</button>
+    </div>
+    <img id="barPlot" src="{{ url_for('static', filename='bar_plot_monthly.png') }}" alt="Income Bar Plot">
+    <h1>Growth Data</h1>
+    <div id="growth-table-container">
+        {{ growth_table|safe }}
+    </div>
     <script>
         function updatePlot(period) {
             fetch(`/update_plot/${period}`)
                 .then(response => response.json())
                 .then(data => {
-                    document.getElementById('bar-plot').src = data.plot_url;
+                    document.getElementById('barPlot').src = data.plot_url;
                 });
         }
     </script>

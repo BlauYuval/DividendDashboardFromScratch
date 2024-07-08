@@ -49,7 +49,7 @@ def prepare_to_vizualize_secotrs_bar(portfolio_data):
     # df_for_plot = portfolio_by_sectors_data.copy()
     # df_for_plot['Amount Paid'] = df_for_plot['Amount Paid'].apply(lambda x: round(x, 2))
     df_for_plot = portfolio_data.copy()
-    df_for_plot['Amount Paid'] = df_for_plot['Amount Paid'].apply(lambda  x: int(x.replace(',', '').replace('$', '')))
+    # df_for_plot['Amount Paid'] = df_for_plot['Amount Paid'].apply(lambda  x: int(x.replace(',', '').replace('$', '')))
     df_for_plot['Percent'] = (df_for_plot['Amount Paid']/df_for_plot['Amount Paid'].sum()).apply(lambda x: round(x, 2))*100     
     df_for_plot = df_for_plot.sort_values('Percent', ascending=True)
     
