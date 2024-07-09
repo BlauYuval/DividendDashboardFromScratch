@@ -163,3 +163,4 @@ cython_debug/
 
 # credenitilas json
 secrets/
+.vercel
