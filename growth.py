@@ -1,4 +1,3 @@
-# TODO - ADD DIVIDEND YIELD COLUMN
 import pandas as pd
 import numpy as np
 
