@@ -14,11 +14,11 @@ matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 from dotenv import load_dotenv
 from flask_basicauth import BasicAuth
-from flask import Flask, render_template, jsonify  
+from flask import Flask, render_template, jsonify, url_for 
 
 from income import Income
 from executive_summery import ExecutiveSummery
-from visualization import vizualize_income_bar, vizualize_sectors_bar
+from visualization import vizualize_income_bar, vizualize_sectors_bar, vizualize_cumsum_returns
 
 app = Flask(__name__)
 
@@ -61,6 +61,7 @@ def index():
     transaction_data_json = r.get('transaction_data')
     portfolio_to_plot_json = r.get('portfolio_to_plot')
     portfolio_table_json = r.get('portfolio_table')
+    portfolio_cumsum_returns = r.get('portfolio_cumsum_returns')
     dividends_data_json = r.get('dividends_data')
     growth_data_json = r.get('growth_table')
 
@@ -70,6 +71,10 @@ def index():
     portfolio_table = pd.DataFrame(ast.literal_eval(portfolio_table_json.decode('utf-8')))
     portfolio_to_plot = pd.DataFrame(ast.literal_eval(portfolio_to_plot_json.decode('utf-8')))
     portfolio_to_plot['Date'] = pd.to_datetime(portfolio_to_plot['Date'], unit='ms')
+    portfolio_cumsum_returns = pd.DataFrame.from_dict(ast.literal_eval(portfolio_cumsum_returns.decode('utf-8')), orient='index')
+    portfolio_cumsum_returns = portfolio_cumsum_returns.reset_index()
+    portfolio_cumsum_returns.columns = ['Date', 'Return']
+    portfolio_cumsum_returns['Date'] = pd.to_datetime(portfolio_cumsum_returns['Date'], unit='ms')
     dividends_data = pd.DataFrame(ast.literal_eval(dividends_data_json.decode('utf-8')))
     income = Income(transaction_data, dividends_data)
     monthly_income, yearly_income = income.run()
@@ -103,6 +108,15 @@ def index():
     plt.title('Portfolio Returns', color='white')  # Set plot title to white
     plt.savefig('static/plot.png')
     plt.close()
+    
+    # Plot Cumsum returns
+    for period in ['Week', 'Month', '6 Month', 'YTD', '1 Year', '5 Year', 'All']:
+        cumsum_plot = vizualize_cumsum_returns(portfolio_cumsum_returns, period)
+        period_lower = period.lower().replace(' ', '_')
+        name = f'static/portfolio_cumsum_returns_{period_lower}.png'
+        plt.savefig(name)
+        plt.close(cumsum_plot)
+        
 
     # Generate sectors bar plot
     sector_bar = vizualize_sectors_bar(portfolio_table)
@@ -151,6 +165,13 @@ def index():
 def update_plot(period):
     plot_filename = f'static/bar_plot_{period}.png'
     return jsonify({'plot_url': plot_filename})
+
+@app.route('/update_cumsum_plot/<period>')
+@basic_auth.required
+def update_cumsum_plot(period):
+    plot_filename = f'portfolio_cumsum_returns_{period}.png'
+    return jsonify({'plot_url': url_for('static', filename=plot_filename)})
+
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))

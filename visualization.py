@@ -75,3 +75,39 @@ def vizualize_sectors_bar(portfolio_data):
     plt.tight_layout()
     
     return fig
+
+def prepare_to_vizualize_cumsum_returns(portfolio_cumsum_returns, period):
+    
+    if period == 'Week':
+        data = portfolio_cumsum_returns[-7:]
+    elif period == 'Month':
+        data = portfolio_cumsum_returns[-30:]
+    elif period == '6 Month':
+        data = portfolio_cumsum_returns[-30*6:]
+    elif period == 'YTD':
+        data = portfolio_cumsum_returns[portfolio_cumsum_returns['Date'].dt.year >= portfolio_cumsum_returns['Date'].dt.year.max()]
+    elif period == '1 Year':
+        data = portfolio_cumsum_returns[-365:]       
+    elif period == '5 Years':
+        data = portfolio_cumsum_returns[-365*5:]  
+    elif period == 'All':
+        data = portfolio_cumsum_returns  
+    else:
+        data = portfolio_cumsum_returns          
+
+    return data
+
+def vizualize_cumsum_returns(portfolio_cumsum_returns, period):
+    chart_data = prepare_to_vizualize_cumsum_returns(portfolio_cumsum_returns, period)
+    fig, ax = plt.subplots(figsize=(10, 6), facecolor='none')
+    sns.set(style="darkgrid")
+    sns.lineplot(data=chart_data, y='Return', x='Date', color="white", ax=ax)
+    ax.set_facecolor('none')  # Set the plot background to be transparent
+    ax.grid(False)  # Remove the grid
+    plt.xticks(color='white')  # Set x-axis labels to white
+    plt.yticks(color='white')  # Set y-axis labels to white
+    plt.xlabel('Date', color='white')  # Set x-axis title to white
+    plt.ylabel('Return', color='white')  # Set y-axis title to white
+    plt.title('Portfolio Returns', color='white')  # Set plot title to white
+
+    return fig

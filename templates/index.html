@@ -70,6 +70,20 @@
         <div class="executive-summery-box">Average Dividend Growth: {{ average_dividend_growth }}</div>
     </div>
     <img src="{{ url_for('static', filename='plot.png') }}" alt="Plot">
+    
+    <!-- Add the cumulative sum return plots here -->
+    <h1>Cumulative Sum Returns</h1>
+    <div class="btn-group">
+        <button onclick="updateCumsumPlot('week')">Week</button>
+        <button onclick="updateCumsumPlot('month')">Month</button>
+        <button onclick="updateCumsumPlot('6_month')">6 Month</button>
+        <button onclick="updateCumsumPlot('ytd')">YTD</button>
+        <button onclick="updateCumsumPlot('1_year')">1 Year</button>
+        <button onclick="updateCumsumPlot('5_year')">5 Year</button>
+        <button onclick="updateCumsumPlot('all')">All</button>
+    </div>
+    <img id="cumsumPlot" src="{{ url_for('static', filename='portfolio_cumsum_returns_all.png') }}" alt="Cumsum Returns Plot">
+
     <h1>Sector Distribution</h1>
     <img src="{{ url_for('static', filename='sectors_bar_plot.png') }}" alt="Sectors Bar Plot">
     <h1>Data Table</h1>
@@ -95,6 +109,14 @@
                 .then(response => response.json())
                 .then(data => {
                     document.getElementById('barPlot').src = data.plot_url;
+                });
+        }
+
+        function updateCumsumPlot(period) {
+            fetch(`/update_cumsum_plot/${period}`)
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('cumsumPlot').src = data.plot_url;
                 });
         }
     </script>
