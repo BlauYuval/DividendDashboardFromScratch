@@ -1,6 +1,7 @@
 import os
 import json
 import redis
+import pandas as pd
 from income import Income
 from Portfilio import Portfolio
 from growth import DividendGrowth
@@ -25,6 +26,8 @@ transaction_data, sectors_data, daily_prices, dividends_data = data_loader.run()
 ## PORTFOLIO
 portfolio_returns = PortfolioReturns(transaction_data.rename(columns={'signed_shares':'shares'}), daily_prices)
 total_amounts = portfolio_returns.run()
+tickers_returns_list = [portfolio_returns.shares_per_date_dict[ticker]['current_amount'] for ticker in portfolio_returns.shares_per_date_dict]
+portfolio_cumsum_returns = pd.concat(tickers_returns_list, axis=1).sum(axis=1)
 portfolio_to_plot = portfolio_returns.plot_portfolio(total_amounts, transaction_data['date'].min(), portfolio_returns.today)
 portfolio_to_plot = portfolio_to_plot.reset_index()
 portfolio_to_plot.columns = ['Date', 'Return']
@@ -48,6 +51,7 @@ if len(dividends_data) > 0:
 r.set('transaction_data', transaction_data.to_json())
 r.set('portfolio_to_plot', portfolio_to_plot.to_json())
 r.set('portfolio_table', portfolio_table.to_json())
+r.set('portfolio_cumsum_returns', portfolio_cumsum_returns.to_json())
 if len(dividends_data) > 0:
     r.set('dividends_data', dividends_data.reset_index().to_json())
     r.set('income_dict', income_dict)
