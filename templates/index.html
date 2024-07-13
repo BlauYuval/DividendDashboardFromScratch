@@ -86,8 +86,10 @@
 
     <h1>Sector Distribution</h1>
     <img src="{{ url_for('static', filename='sectors_bar_plot.png') }}" alt="Sectors Bar Plot">
+    
     <h1>Data Table</h1>
     {{ table|safe }}
+    
     <h1>Monthly Income Distribution</h1>
     <div class="income-container">
         <div class="income-box">Monthly Income: {{ monthly_income }}</div>
@@ -99,10 +101,16 @@
         <button onclick="updatePlot('yearly')">Yearly</button>
     </div>
     <img id="barPlot" src="{{ url_for('static', filename='bar_plot_monthly.png') }}" alt="Income Bar Plot">
+    
+    <!-- Yield on Cost Plot -->
+    <h1>Historical Yield on Cost</h1>
+    <img src="{{ url_for('static', filename='yield_line.png') }}" alt="Yield Line Plot">
+
     <h1>Growth Data</h1>
     <div id="growth-table-container">
         {{ growth_table|safe }}
     </div>
+
     <script>
         function updatePlot(period) {
             fetch(`/update_plot/${period}`)

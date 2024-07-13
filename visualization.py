@@ -111,3 +111,18 @@ def vizualize_cumsum_returns(portfolio_cumsum_returns, period):
     plt.title('Portfolio Returns', color='white')  # Set plot title to white
 
     return fig
+
+def visualize_historical_yield_on_cost(hist_yield_on_cost):
+    
+    fig, ax = plt.subplots(figsize=(10, 6), facecolor='none')
+    sns.set(style="darkgrid")
+    sns.lineplot(data=hist_yield_on_cost, y='Yield On Cost', x='Date', color="white", ax=ax)
+    ax.set_facecolor('none')  # Set the plot background to be transparent
+    ax.grid(False)  # Remove the grid
+    plt.xticks(color='white')  # Set x-axis labels to white
+    plt.yticks(color='white')  # Set y-axis labels to white
+    plt.xlabel('Date', color='white')  # Set x-axis title to white
+    plt.ylabel('Yield On Cost', color='white')  # Set y-axis title to white
+    plt.title('Yield On Cost', color='white')  # Set plot title to white
+
+    return fig

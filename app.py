@@ -1,6 +1,5 @@
-# TODO - ADD PORTFOLIO CHART OF MONEY ADDED
-# TODO - ADD YIELD ON COST CHART OVER TIME
 # TODO - FIX HEADLINES NAMES
+# TODO - ADD BUTTONS TO PORTFOLIO RETURNS
 # TODO - ADD DIVIDEND YIELD COLUMN TO GROWTH TABLE
 
 
@@ -18,7 +17,7 @@ from flask import Flask, render_template, jsonify, url_for
 
 from income import Income
 from executive_summery import ExecutiveSummery
-from visualization import vizualize_income_bar, vizualize_sectors_bar, vizualize_cumsum_returns
+from visualization import vizualize_income_bar, vizualize_sectors_bar, vizualize_cumsum_returns, visualize_historical_yield_on_cost
 
 app = Flask(__name__)
 
@@ -64,6 +63,7 @@ def index():
     portfolio_cumsum_returns = r.get('portfolio_cumsum_returns')
     dividends_data_json = r.get('dividends_data')
     growth_data_json = r.get('growth_table')
+    hist_yield_on_cost_json = r.get('hist_yield_on_cost')
 
     transaction_data = pd.DataFrame(ast.literal_eval(transaction_data_json.decode('utf-8')))
     transaction_data['date'] = pd.to_datetime(transaction_data['date'], unit='ms')
@@ -83,6 +83,9 @@ def index():
     growth_data = pd.DataFrame(ast.literal_eval(growth_data_str))
     growth_data['start_payment_date'] = pd.to_datetime(growth_data['start_payment_date'], unit='ms')
     growth_data.columns = [" ".join([part.capitalize() for part in col.split('_')]) for col in growth_data.columns]
+    hist_yield_on_cost = pd.DataFrame(ast.literal_eval(hist_yield_on_cost_json.decode('utf-8'))).reset_index()
+    hist_yield_on_cost['Date'] = pd.to_datetime(hist_yield_on_cost['index'], unit='ms')
+    hist_yield_on_cost = hist_yield_on_cost.rename(columns={'yield_on_cost': 'Yield On Cost'})
     
     # Display
     ## Executive Summary
@@ -142,6 +145,12 @@ def index():
     bar_plot_y.savefig('static/bar_plot_yearly.png')
     plt.close(bar_plot_y.figure)
 
+    # Yield pn cost
+    yield_line = visualize_historical_yield_on_cost(hist_yield_on_cost)
+    yield_line.savefig('static/yield_line.png')
+    plt.close(yield_line.figure)
+
+    
     # Apply conditional formatting to growth_data
     growth_data_styled = growth_data.style.applymap(
         lambda x: color_cagr(x, growth_data.loc[growth_data.index[growth_data['Cagr since holding'] == x].tolist()[0]]),

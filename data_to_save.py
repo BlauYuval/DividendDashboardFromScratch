@@ -1,6 +1,7 @@
 import os
 import json
 import redis
+import numpy as np
 import pandas as pd
 from income import Income
 from Portfilio import Portfolio
@@ -46,7 +47,26 @@ if len(dividends_data) > 0:
     tickers = portfolio.portfolio_data.ticker.to_list()
     growth = DividendGrowth(income.transaction_data[['ticker','start_payment_date']], dividends_data, tickers)
     growth_df = growth.run()
-
+    
+    ## HISTORICAL YIELD ON COST
+    tickers_freq = dividends_data.groupby(['ticker','frequency'])['payment_date'].max().reset_index().set_index('ticker')['frequency']
+    dividend_daily_data = income.dividend_daily_data[tickers].copy()
+    for ticker in tickers:
+        dividend_daily_data[ticker] = dividend_daily_data[ticker] * tickers_freq.loc[ticker]
+        dividend_daily_data[ticker] = dividend_daily_data[ticker].replace(0, np.nan)
+        dividend_daily_data[ticker] = dividend_daily_data[ticker].fillna(method='ffill')
+    valid_index_tickeres = (dividend_daily_data.tail(1).isnull() == False).T
+    valid_tickers = (valid_index_tickeres[valid_index_tickeres].dropna().index)
+    dividend_daily_data['SUM'] = dividend_daily_data.sum(axis=1)
+    dividend_daily_data['NET'] = dividend_daily_data['SUM'] * (1 - income.tax_rate)
+    tickers_amount_paid_list = [portfolio_returns.shares_per_date_dict[ticker]['amount_paid'] for ticker in valid_tickers]
+    portfolio_cumsum_amount_paid = pd.concat(tickers_amount_paid_list, axis=1).sum(axis=1)
+    portfolio_cumsum_amount_paid = portfolio_cumsum_amount_paid.reset_index()
+    portfolio_cumsum_amount_paid.columns = ['Date', 'Amount_Paid']
+    hist_yield_on_cost = portfolio_cumsum_amount_paid.set_index('Date')
+    hist_yield_on_cost = hist_yield_on_cost.merge(dividend_daily_data[['SUM', 'NET']], left_index=True, right_index=True, how='left')
+    hist_yield_on_cost['yield_on_cost'] = 100*(hist_yield_on_cost['NET'] / hist_yield_on_cost['Amount_Paid'])
+    
 # Save data to Redis
 r.set('transaction_data', transaction_data.to_json())
 r.set('portfolio_to_plot', portfolio_to_plot.to_json())
@@ -56,3 +76,4 @@ if len(dividends_data) > 0:
     r.set('dividends_data', dividends_data.reset_index().to_json())
     r.set('income_dict', income_dict)
     r.set('growth_table', growth_df.to_json())
+    r.set('hist_yield_on_cost', hist_yield_on_cost[['yield_on_cost']].to_json())
