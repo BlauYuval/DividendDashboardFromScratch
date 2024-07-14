@@ -109,6 +109,25 @@ def vizualize_cumsum_returns(portfolio_cumsum_returns, period):
     plt.xlabel('Date', color='white')  # Set x-axis title to white
     plt.ylabel('Return', color='white')  # Set y-axis title to white
     plt.title('Portfolio Returns', color='white')  # Set plot title to white
+    
+
+    return fig
+
+def vizualize_portfilio_returns(portfolio_to_plot, period):
+    
+    chart_data = prepare_to_vizualize_cumsum_returns(portfolio_to_plot, period).copy()
+    chart_data['Return'] = chart_data['Return'] - chart_data['Return'][0]
+    fig, ax = plt.subplots(figsize=(10, 6), facecolor='none')
+    sns.set(style="darkgrid")
+    sns.lineplot(data=chart_data, y='Return', x='Date', color="white", ax=ax)
+    ax.set_facecolor('none')  # Set the plot background to be transparent
+    ax.grid(False)  # Remove the grid
+    plt.xticks(color='white')  # Set x-axis labels to white
+    plt.yticks(color='white')  # Set y-axis labels to white
+    plt.xlabel('Date', color='white')  # Set x-axis title to white
+    plt.ylabel('Return', color='white')  # Set y-axis title to white
+    return_num = str(round(100*(chart_data['Return'][-1]), 2)) + ' %'
+    plt.title(f'{return_num} Return', color='white')  # Set plot title to white
 
     return fig
 

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Data Visualization</title>
+    <title>Dividend Growth Investing Dashboard</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <style>
         body {
@@ -62,17 +62,27 @@
     </style>
 </head>
 <body>
-    <h1>Data Visualization</h1>
+    <h1>Dividend Growth Investing Dashboard</h1>
     <div class="executive-summery-container">
         <div class="executive-summery-box">Total Return: {{ total_return }}</div>
         <div class="executive-summery-box">Return Yield: {{ return_yield }}</div>
         <div class="executive-summery-box">Yield on Cost: {{ yield_on_cost }}</div>
         <div class="executive-summery-box">Average Dividend Growth: {{ average_dividend_growth }}</div>
     </div>
-    <img src="{{ url_for('static', filename='plot.png') }}" alt="Plot">
+    <div class="btn-group">
+        <h2>Portfolio Returns</h2>
+        <button onclick="updateReturnsPlot('week')">Week</button>
+        <button onclick="updateReturnsPlot('month')">Month</button>
+        <button onclick="updateReturnsPlot('6_month')">6 Month</button>
+        <button onclick="updateReturnsPlot('ytd')">YTD</button>
+        <button onclick="updateReturnsPlot('1_year')">1 Year</button>
+        <button onclick="updateReturnsPlot('5_year')">5 Year</button>
+        <button onclick="updateReturnsPlot('all')">All</button>
+    </div>
+    <img id="returnsPlot" src="{{ url_for('static', filename='portfolio_returns_plot_all.png') }}" alt="Portfolio Returns Plot">
     
     <!-- Add the cumulative sum return plots here -->
-    <h1>Cumulative Sum Returns</h1>
+    <h2>Cumulative Sum Returns</h2>
     <div class="btn-group">
         <button onclick="updateCumsumPlot('week')">Week</button>
         <button onclick="updateCumsumPlot('month')">Month</button>
@@ -84,13 +94,13 @@
     </div>
     <img id="cumsumPlot" src="{{ url_for('static', filename='portfolio_cumsum_returns_all.png') }}" alt="Cumsum Returns Plot">
 
-    <h1>Sector Distribution</h1>
+    <h2>Sector Distribution</h2>
     <img src="{{ url_for('static', filename='sectors_bar_plot.png') }}" alt="Sectors Bar Plot">
     
-    <h1>Data Table</h1>
+    <h2>Current Holdings</h2>
     {{ table|safe }}
     
-    <h1>Monthly Income Distribution</h1>
+    <h2>Monthly Income Distribution</h2>
     <div class="income-container">
         <div class="income-box">Monthly Income: {{ monthly_income }}</div>
         <div class="income-box">Yearly Income: {{ yearly_income }}</div>
@@ -103,10 +113,10 @@
     <img id="barPlot" src="{{ url_for('static', filename='bar_plot_monthly.png') }}" alt="Income Bar Plot">
     
     <!-- Yield on Cost Plot -->
-    <h1>Historical Yield on Cost</h1>
+    <h2>Historical Yield on Cost</h2>
     <img src="{{ url_for('static', filename='yield_line.png') }}" alt="Yield Line Plot">
 
-    <h1>Growth Data</h1>
+    <h2>Dividend Growth</h2>
     <div id="growth-table-container">
         {{ growth_table|safe }}
     </div>
@@ -125,6 +135,14 @@
                 .then(response => response.json())
                 .then(data => {
                     document.getElementById('cumsumPlot').src = data.plot_url;
+                });
+        }
+
+        function updateReturnsPlot(period) {
+            fetch(`/update_returns_plot/${period}`)
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('returnsPlot').src = data.plot_url;
                 });
         }
     </script>
