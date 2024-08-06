@@ -66,7 +66,7 @@ def index():
 
     transaction_data = pd.DataFrame(ast.literal_eval(transaction_data_json.decode('utf-8')))
     transaction_data['date'] = pd.to_datetime(transaction_data['date'], unit='ms')
-    transaction_data['start_payment_date'] = pd.to_datetime(transaction_data['start_payment_date'], unit='ms')
+    # transaction_data['start_payment_date'] = pd.to_datetime(transaction_data['start_payment_date'], unit='ms')
     portfolio_table = pd.DataFrame(ast.literal_eval(portfolio_table_json.decode('utf-8')))
     portfolio_to_plot = pd.DataFrame(ast.literal_eval(portfolio_to_plot_json.decode('utf-8')))
     portfolio_to_plot['Date'] = pd.to_datetime(portfolio_to_plot['Date'], unit='ms')
