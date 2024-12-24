@@ -97,14 +97,15 @@ class DividendGrowth:
             
             ticker = tickers_df.iloc[i]['ticker']
             start_payment_date = tickers_df.iloc[i]['start_payment_date']
-            annual_prev_payments = self._get_annaul_previous_payments(ticker, start_payment_date)
-            years_of_growth = self._calc_historical_years_of_growth(annual_prev_payments.value.to_list())
-            annual_prev_payments = annual_prev_payments[:years_of_growth+1]
-            cagr_10y = self._calc_cagr(annual_prev_payments.iloc[min(years_of_growth,10)]['value'], annual_prev_payments.iloc[0]['value'], min(years_of_growth,10))
-            cagr_5y = self._calc_cagr(annual_prev_payments.iloc[min(years_of_growth,5)]['value'], annual_prev_payments.iloc[0]['value'], min(years_of_growth,5))
-            cagr_3y = self._calc_cagr(annual_prev_payments.iloc[min(years_of_growth,3)]['value'], annual_prev_payments.iloc[0]['value'], min(years_of_growth,3))
-            cagr_1y = self._calc_cagr(annual_prev_payments.iloc[min(years_of_growth,1)]['value'], annual_prev_payments.iloc[0]['value'], min(years_of_growth,1))
-            prev_cagr[i] = [cagr_10y, cagr_5y, cagr_3y, cagr_1y]
+            if ticker in self.dividends_data.ticker.unique():
+                annual_prev_payments = self._get_annaul_previous_payments(ticker, start_payment_date)
+                years_of_growth = self._calc_historical_years_of_growth(annual_prev_payments.value.to_list())
+                annual_prev_payments = annual_prev_payments[:years_of_growth+1]
+                cagr_10y = self._calc_cagr(annual_prev_payments.iloc[min(years_of_growth,10)]['value'], annual_prev_payments.iloc[0]['value'], min(years_of_growth,10))
+                cagr_5y = self._calc_cagr(annual_prev_payments.iloc[min(years_of_growth,5)]['value'], annual_prev_payments.iloc[0]['value'], min(years_of_growth,5))
+                cagr_3y = self._calc_cagr(annual_prev_payments.iloc[min(years_of_growth,3)]['value'], annual_prev_payments.iloc[0]['value'], min(years_of_growth,3))
+                cagr_1y = self._calc_cagr(annual_prev_payments.iloc[min(years_of_growth,1)]['value'], annual_prev_payments.iloc[0]['value'], min(years_of_growth,1))
+                prev_cagr[i] = [cagr_10y, cagr_5y, cagr_3y, cagr_1y]
             
         prev_cagr_df = pd.DataFrame.from_dict(prev_cagr, orient='index', columns=['cagr_10y', 'cagr_5y', 'cagr_3y', 'cagr_1y'])
         prev_cagr_df = pd.concat([tickers_df, prev_cagr_df], axis=1).drop(columns=['start_payment_date', 'frequency'], axis=1)

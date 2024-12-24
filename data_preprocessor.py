@@ -51,4 +51,9 @@ class DividendDataPreprocessor:
         """
         Assuming our input is a dictionary conatains the ticker as key and the dividend data as value
         """
-        self.df = pd.concat([self.preprocess_single_ticker_data(dfs[ticker], ticker) for ticker in dfs])
+        processed_single_ticker_data_list = []
+        for ticker in dfs:
+            if dfs[ticker].shape[0] > 0:
+                processed_single_ticker_data_list.append(self.preprocess_single_ticker_data(dfs[ticker], ticker))
+        self.df = pd.concat(processed_single_ticker_data_list)
+        # self.df = pd.concat([self.preprocess_single_ticker_data(dfs[ticker], ticker) for ticker in dfs])
