@@ -21,13 +21,15 @@ class Income:
         Returns:
             start_date (pd.Timestamp) : start date for the payments
         """
+        start_date = None
         dividends = dividends_data[dividends_data.ticker == ticker]
-        dividends_ex_date_after_transaction = dividends[dividends.ex_date > date.strftime("%Y-%m-%d")]
-        if dividends_ex_date_after_transaction.shape[0] > 0:
-            start_date = pd.to_datetime(dividends_ex_date_after_transaction.iloc[0]['ex_date'])
-        else:
-            start_date = dividends[dividends.ex_date <= date.strftime("%Y-%m-%d")].iloc[-1]['payment_date']
-            start_date = (pd.to_datetime(start_date) + pd.Timedelta(1,'d'))
+        if len(dividends) > 0:
+            dividends_ex_date_after_transaction = dividends[dividends.ex_date > date.strftime("%Y-%m-%d")]
+            if dividends_ex_date_after_transaction.shape[0] > 0:
+                start_date = pd.to_datetime(dividends_ex_date_after_transaction.iloc[0]['ex_date'])
+            else:
+                start_date = dividends[dividends.ex_date <= date.strftime("%Y-%m-%d")].iloc[-1]['payment_date']
+                start_date = (pd.to_datetime(start_date) + pd.Timedelta(1,'d'))
             
         return start_date    
         
@@ -73,7 +75,8 @@ class Income:
                 self.dividend_daily_data[ticker] = self.dividend_daily_data[ticker]*self.dividend_daily_data[f'{ticker}_dividends']
                 self.dividend_daily_data.drop([f'{ticker}_dividends'], axis=1, inplace=True)
             else:
-                self.dividend_daily_data.drop([ticker], axis=1, inplace=True)
+                pass
+                # self.dividend_daily_data.drop([ticker], axis=1, inplace=True)
                 
         self.dividend_daily_data['SUM'] = self.dividend_daily_data.sum(axis=1)
         self.dividend_daily_data['NET'] = self.dividend_daily_data['SUM']*(1 - self.tax_rate)

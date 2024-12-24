@@ -4,6 +4,7 @@
 
 import os
 import ast
+import json
 import redis
 import matplotlib
 import pandas as pd
@@ -64,7 +65,8 @@ def index():
     growth_data_json = r.get('growth_table')
     hist_yield_on_cost_json = r.get('hist_yield_on_cost')
 
-    transaction_data = pd.DataFrame(ast.literal_eval(transaction_data_json.decode('utf-8')))
+    # transaction_data = pd.DataFrame(ast.literal_eval(transaction_data_json.decode('utf-8')))
+    transaction_data = pd.DataFrame(json.loads(transaction_data_json.decode('utf-8')))
     transaction_data['date'] = pd.to_datetime(transaction_data['date'], unit='ms')
     # transaction_data['start_payment_date'] = pd.to_datetime(transaction_data['start_payment_date'], unit='ms')
     portfolio_table = pd.DataFrame(ast.literal_eval(portfolio_table_json.decode('utf-8')))

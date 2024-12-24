@@ -50,6 +50,7 @@ if len(dividends_data) > 0:
     
     ## HISTORICAL YIELD ON COST
     tickers_freq = dividends_data.groupby(['ticker','frequency'])['payment_date'].max().reset_index().set_index('ticker')['frequency']
+    tickers = sorted(list(set(tickers).intersection(set(income.dividend_daily_data.columns))))
     dividend_daily_data = income.dividend_daily_data[tickers].copy()
     for ticker in tickers:
         dividend_daily_data[ticker] = dividend_daily_data[ticker] * tickers_freq.loc[ticker]
